@@ -25,6 +25,7 @@ export default function CreateEvent() {
   async function handleSubmit(e) {
     e.preventDefault();
     // the event deposit, max capacity, timestamp, etc. will be stored in on-chain with our smart contract
+	console.log(eventName)
     const body = {
       name: eventName,
       description: eventDescription,
@@ -55,7 +56,7 @@ export default function CreateEvent() {
 
   const createEvent = async (cid) => {
     try {
-      const rsvpContract = connectContract();
+      const rsvpContract = await connectContract();
 
       if (rsvpContract) {
         let deposit = ethers.utils.parseEther(refund);
@@ -63,8 +64,6 @@ export default function CreateEvent() {
         let eventTimestamp = eventDateAndTime.getTime();
         let eventDataCID = cid;
 
-        console.log("Minting...", txn.hash);
-        setLoading(true);
         const txn = await rsvpContract.createNewEvent(
           eventTimestamp,
           deposit,
@@ -72,6 +71,8 @@ export default function CreateEvent() {
           eventDataCID,
           { gasLimit: 900000 }
         );
+		console.log("Minting...", txn.hash);
+        setLoading(true);
 
         const txnReceipt = await txn.wait();
         if (txnReceipt.status === 1) {
